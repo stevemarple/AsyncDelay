@@ -63,6 +63,10 @@ public:
     d = delay;
     u = unit;
   }
+
+  inline unsigned long getExpiry(void) const {
+    return expires;
+  }
   
 private:
   unsigned long delay;
