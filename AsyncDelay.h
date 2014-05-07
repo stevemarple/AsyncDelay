@@ -37,7 +37,23 @@ public:
       return (long(millis() - expires) >= 0);
   }
 
+  inline bool isExpired(void) const volatile {
+    if (unit == MICROS)
+      return (long(micros() - expires) >= 0);
+    else
+      return (long(millis() - expires) >= 0);   
+  }
+
   inline void start(unsigned long d, units_t u) {
+    delay = d;
+    unit = u;
+    if (unit == MICROS)
+      expires = micros() + delay;
+    else
+      expires = millis() + delay;
+  }
+
+  inline void start(unsigned long d, units_t u) volatile {
     delay = d;
     unit = u;
     if (unit == MICROS)
@@ -51,8 +67,19 @@ public:
     expires += delay;
   }
 
+  inline void repeat(void) volatile {
+    expires += delay;
+  }
+
   // Force a delay to be expired
   inline void expire(void) {
+    if (unit == MICROS)
+      expires = micros();
+    else
+      expires = millis();   
+  }
+
+  inline void expire(void) volatile {
     if (unit == MICROS)
       expires = micros();
     else
@@ -64,10 +91,19 @@ public:
     u = unit;
   }
 
+  inline void getDelay(unsigned long &d, units_t &u) volatile {
+    d = delay;
+    u = unit;
+  }
+  
   inline unsigned long getExpiry(void) const {
     return expires;
   }
-  
+
+  inline unsigned long getExpiry(void) const volatile {
+    return expires;
+  }
+
 private:
   unsigned long delay;
   unsigned long expires;
