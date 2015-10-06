@@ -1,0 +1,27 @@
+#######################################
+# Syntax Coloring Map For AsyncDelay
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+AsyncDelay	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+isExpired	KEYWORD2
+start		KEYWORD2
+repeat		KEYWORD2
+expire		KEYWORD2
+getDelay	KEYWORD2
+getExpiry	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+MICROS	LITERAL1
+MILLIS	LITERAL1
