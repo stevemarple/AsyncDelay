@@ -88,12 +88,12 @@ public:
       expires = millis();   
   }
 
-  inline void getDelay(unsigned long &d, units_t &u) {
+  inline void getDelay(unsigned long &d, units_t &u) const {
     d = delay;
     u = unit;
   }
 
-  inline void getDelay(unsigned long &d, units_t &u) volatile {
+  inline void getDelay(unsigned long &d, units_t &u) const volatile {
     d = delay;
     u = unit;
   }
