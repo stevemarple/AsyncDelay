@@ -1,7 +1,7 @@
 #ifndef ASYNCDELAY_H
 #define ASYNCDELAY_H
 
-#define ASYNCDELAY_VERSION "1.0.2"
+#define ASYNCDELAY_VERSION "1.1.0"
 
 /*
  * A timer implementation for the Arduino which is safe from the
