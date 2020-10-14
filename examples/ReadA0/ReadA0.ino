@@ -19,7 +19,6 @@ void loop(void)
   if (samplingInterval.isExpired()) {
     uint16_t count  = analogRead(A0);
     samplingInterval.repeat();
-    Serial.print(count);
-    Serial.print('\n');
+    Serial.println(count);
   }
 }
