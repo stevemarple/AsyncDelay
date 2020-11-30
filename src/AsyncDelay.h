@@ -1,167 +1,278 @@
 #ifndef ASYNCDELAY_H
 #define ASYNCDELAY_H
 
-#define ASYNCDELAY_VERSION "1.1.2"
-
-/*
- * A timer implementation for the Arduino which is safe from the
- * effects of rollover. See
- * http://arduino.cc/playground/Code/TimingRollover for details. This
- * class conveniently encapsulates that behaviour.
- */
-
 #include <Arduino.h>
 
+#define ASYNCDELAY_VERSION "1.1.2"
+
+/**
+ * @file AsyncDelay.h
+ */
+
+
+/**
+ * @class AsyncDelay
+ * @brief A timer implementation safe from the effects of rollover.
+ * @details The AsyncDelay class conveniently encapsulates the
+ *  behaviour described at
+ *  http://arduino.cc/playground/Code/TimingRollover
+ *
+ *  @author Steve Marple
+ */
 class AsyncDelay {
-public:
-  enum units_t {
-    MICROS,
-    MILLIS,
-  };
+  public:
 
-  // Have default delay to be zero so that timer is already expired.
-  inline AsyncDelay(void) : delay(0), unit(MILLIS) {
-    expires = millis() + delay;
-  }
-  
-  inline AsyncDelay(unsigned long d, units_t u)
-    : delay(d), unit(u) {
-    if (unit == MICROS)
-      expires = micros() + delay;
-    else
-      expires = millis() + delay;
-  }
-  
-  inline bool isExpired(void) const {
-    if (unit == MICROS)
-      return (long(micros() - expires) >= 0);
-    else
-      return (long(millis() - expires) >= 0);
-  }
+    /**
+     * @brief The unit used for the delay
+     */
+    enum units_t {
+      /**
+       * @brief Microseconds
+       */
+      MICROS,
+      /**
+       * @brief Milliseconds
+       */
+      MILLIS,
+    };
 
-  inline bool isExpired(void) const volatile {
-    if (unit == MICROS)
-      return (long(micros() - expires) >= 0);
-    else
-      return (long(millis() - expires) >= 0);   
-  }
 
-  inline void start(unsigned long d, units_t u) {
-    delay = d;
-    unit = u;
-    if (unit == MICROS)
-      expires = micros() + delay;
-    else
-      expires = millis() + delay;
-  }
+    /**
+     * @brief Default AsyncDelay constructor
+     * @details Initializes the delay to zero. 
+     * The timer will always be expired until `start()` is called.
+     */
+    inline AsyncDelay(void) : _delay(0), _unit(MILLIS) {
+      expires = millis() + _delay;
+    }
 
-  inline void start(unsigned long d, units_t u) volatile {
-    delay = d;
-    unit = u;
-    if (unit == MICROS)
-      expires = micros() + delay;
-    else
-      expires = millis() + delay;
-  }
+    /**
+     * @brief Construct a new Async Delay object
+     *
+     * @param delay The duration the timer should wait for
+     * @param unit The time unit for the delay
+     */
+    inline AsyncDelay(unsigned long delay, units_t unit)
+      : _delay(delay), _unit(unit) {
+      if (_unit == MICROS)
+        expires = micros() + _delay;
+      else
+        expires = millis() + _delay;
+    }
 
-  // Restart the delay from when it expired (not now).
-  inline void repeat(void) {
-    expires += delay;
-  }
+    /**
+     * @brief Test if the timer has expired
+     *
+     * @return true if the timer has expired, false if not
+     */
+    inline bool isExpired(void) const {
+      if (_unit == MICROS)
+        return (long(micros() - expires) >= 0);
+      else
+        return (long(millis() - expires) >= 0);
+    }
 
-  // Restart the delay from when it expired (not now).
-  inline void repeat(void) volatile {
-    expires += delay;
-  }
+    /**
+     * @brief Test if the timer has expired
+     * @return true if the timer has expired, false if not
+     */
+    inline bool isExpired(void) const volatile {
+      if (_unit == MICROS)
+        return (long(micros() - expires) >= 0);
+      else
+        return (long(millis() - expires) >= 0);
+    }
 
-  // Restart the delay from now.
-  inline void restart(void) {
-    if (unit == MICROS)
-      expires = micros() + delay;
-    else
-      expires = millis() + delay;
-  }
+    /**
+     * @brief Start a timer
+     *
+     * @param delay The duration the timer should wait for
+     * @param unit The time unit for the delay
+     */
+    inline void start(unsigned long delay, units_t unit) {
+      _delay = delay;
+      _unit = unit;
+      if (_unit == MICROS)
+        expires = micros() + _delay;
+      else
+        expires = millis() + _delay;
+    }
 
-  // Restart the delay from now.
-  inline void restart(void) volatile {
-    if (unit == MICROS)
-      expires = micros() + delay;
-    else
-      expires = millis() + delay;
-  }
+    /**
+     * @brief Start a timer
+     *
+     * @param delay The duration the timer should wait for
+     * @param unit The time unit for the delay
+     */
+    inline void start(unsigned long delay, units_t unit) volatile {
+      _delay = delay;
+      _unit = unit;
+      if (_unit == MICROS)
+        expires = micros() + _delay;
+      else
+        expires = millis() + _delay;
+    }
 
-  // Force a delay to be expired.
-  inline void expire(void) {
-    if (unit == MICROS)
-      expires = micros();
-    else
-      expires = millis();   
-  }
+    /**
+     * @brief Start the timer from when it expired
+     */
+    inline void repeat(void) {
+      expires += _delay;
+    }
 
-  // Force a delay to be expired.
-  inline void expire(void) volatile {
-    if (unit == MICROS)
-      expires = micros();
-    else
-      expires = millis();   
-  }
+    /**
+     * @brief Start the timer from when it expired
+     */
+    inline void repeat(void) volatile {
+      expires += _delay;
+    }
 
-  inline unsigned long getDelay(void) const {
-    return delay;
-  }
+    /**
+     * @brief Restart the timer from now
+     */
+    inline void restart(void) {
+      if (_unit == MICROS)
+        expires = micros() + _delay;
+      else
+        expires = millis() + _delay;
+    }
 
-  inline unsigned long getDelay(void) const volatile {
-    return delay;
-  }
+    /**
+     * @brief Restart the timer from now
+     */
+    inline void restart(void) volatile {
+      if (_unit == MICROS)
+        expires = micros() + _delay;
+      else
+        expires = millis() + _delay;
+    }
 
-  inline void getDelay(unsigned long &d, units_t &u) const {
-    d = delay;
-    u = unit;
-  }
+    /**
+     * @brief Force a timer to become expired
+     */
+    inline void expire(void) {
+      if (_unit == MICROS)
+        expires = micros();
+      else
+        expires = millis();
+    }
 
-  inline void getDelay(unsigned long &d, units_t &u) const volatile {
-    d = delay;
-    u = unit;
-  }
+    /**
+     * @brief Force a timer to become expired
+     */
+    inline void expire(void) volatile {
+      if (_unit == MICROS)
+        expires = micros();
+      else
+        expires = millis();
+    }
 
-  inline units_t getUnit(void) const {
-    return unit;
-  }
+    /**
+     * @brief Get the delay
+     *
+     * @return unsigned long The delay in whatever unit was set
+     */
+    inline unsigned long getDelay(void) const {
+      return _delay;
+    }
 
-  inline units_t getUnit(void) const volatile {
-    return unit;
-  }
+    /**
+     * @brief Get the delay
+     *
+     * @return unsigned long The delay in whatever unit was set
+     */
+    inline unsigned long getDelay(void) const volatile {
+      return _delay;
+    }
 
-  inline unsigned long getExpiry(void) const {
-    return expires;
-  }
+    /**
+     * @brief Get the units for the delay
+     *
+     * @return units_t The unit
+     */
+    inline units_t getUnit(void) const {
+      return _unit;
+    }
 
-  inline unsigned long getExpiry(void) const volatile {
-    return expires;
-  }
+    /**
+     * @brief Get the units for the delay
+     *
+     * @return units_t The unit
+     */
+    inline units_t getUnit(void) const volatile {
+      return _unit;
+    }
 
-  // Return how long has elapsed since the timer was started.
-  inline unsigned long getDuration(void) const {
-    if (unit == MICROS)
-      return micros() - expires;
-    else
-      return millis() - expires;
-  }
+    /**
+     * @brief Get the delay and unit
+     *
+     * @param delay Reference to where delay is to be saved
+     * @param unit Reference to where unit is to be saved
+     */
+    inline void getDelay(unsigned long &delay, units_t &unit) const {
+      delay = _delay;
+      unit = _unit;
+    }
 
-  inline unsigned long getDuration(void) const volatile {
-    if (unit == MICROS)
-      return micros() - expires;
-    else
-      return millis() - expires;
-  }
+    /**
+     * @brief Get the delay and unit
+     *
+     * @param delay Reference to where delay is to be saved
+     * @param unit Reference to where unit is to be saved
+     */
+    inline void getDelay(unsigned long &delay, units_t &unit) const volatile {
+      delay = _delay;
+      unit = _unit;
+    }
 
-private:
-  unsigned long delay;
-  unsigned long expires;
-  units_t unit;
-  
+    /**
+     * @brief Get the time when the timer expires
+     *
+     * @return unsigned long Time in selected units
+     */
+    inline unsigned long getExpiry(void) const {
+      return expires;
+    }
+
+    /**
+     * @brief Get the time when the timer expires
+     *
+     * @return unsigned long Time in seelcted units
+     */
+    inline unsigned long getExpiry(void) const volatile {
+      return expires;
+    }
+
+    /**
+     * @brief Get the duration since the timer was started
+     *
+     * @return unsigned long Duration in selected units
+     */
+    inline unsigned long getDuration(void) const {
+      if (_unit == MICROS)
+        return micros() - expires;
+      else
+        return millis() - expires;
+    }
+
+    /**
+     * @brief Get the duration since the timer was started
+     *
+     * @return unsigned long Duration in selected units
+     */
+    inline unsigned long getDuration(void) const volatile {
+      if (_unit == MICROS)
+        return micros() - expires;
+      else
+        return millis() - expires;
+    }
+
+  private:
+    unsigned long _delay;
+    unsigned long expires;
+    units_t _unit;
+
 };
-
 
 
 #endif
