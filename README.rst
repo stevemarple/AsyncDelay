@@ -7,7 +7,7 @@ sketches.
 Licence
 -------
 Released under the GNU Lesser General Public License, version 2.1. See
-license.txt for details.
+https://github.com/stevemarple/AsyncDelay/blob/master/LICENSE.txt
 
 Examples
 --------
